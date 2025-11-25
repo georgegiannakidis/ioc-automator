@@ -19,6 +19,7 @@ SCAN_ROOT="${SCAN_ROOT:-/tmp/ioc-sandbox}"
 #   quarantine -> move matching files to QUARANTINE_DIR
 MODE="dry"
 QUARANTINE_DIR=""
+APPLY_FIREWALL=false
 
 # --------------------------------------------------------------------
 # Argument parsing
@@ -37,6 +38,10 @@ while [[ $# -gt 0 ]]; do
       MODE="quarantine"
       QUARANTINE_DIR="$2"
       shift 2
+      ;;
+    --apply-firewall)
+      APPLY_FIREWALL=true
+      shift
       ;;
     *)
       echo "[!] Unknown option: $1"
@@ -73,7 +78,6 @@ load_file_iocs() {
 
     # normalize whitespace
     line="$(echo "$line" | tr -s '[:space:]' ' ')"
-
     hash="$(echo "$line" | awk '{print $1}')"
     fname="$(echo "$line" | awk '{print $2}')"
 
@@ -155,6 +159,36 @@ fi
 }
 
 print_ipset_plan() {
+apply_firewall() {
+  echo
+  echo "[*] Applying firewall changes using ipset + iptables"
+
+  if ! command -v ipset >/dev/null 2>&1 || ! command -v iptables >/dev/null 2>&1; then
+    echo "[!] ipset or iptables not found. Install them first." >&2
+    return 1
+  fi
+
+  # Create or flush the set
+  sudo ipset create ioc_blocklist hash:net -exist
+  sudo ipset flush ioc_blocklist
+
+  for ip in "${ip_iocs[@]}"; do
+    sudo ipset add ioc_blocklist "$ip" -exist
+  done
+
+  # Add DROP rules if they are not already present
+  if ! sudo iptables -C INPUT -m set --match-set ioc_blocklist src -j DROP 2>/dev/null; then
+    sudo iptables -I INPUT -m set --match-set ioc_blocklist src -j DROP
+  fi
+
+  if ! sudo iptables -C FORWARD -m set --match-set ioc_blocklist src -j DROP 2>/dev/null; then
+    sudo iptables -I FORWARD -m set --match-set ioc_blocklist src -j DROP
+  fi
+
+  echo "[*] Firewall rules applied. Current ipset summary:"
+  sudo ipset list ioc_blocklist | sed -n '1,20p'
+}
+
   echo
   echo "===== Firewall Dry-Run Plan ====="
   echo "[*] Would create ipset: ioc_blocklist"
@@ -243,7 +277,12 @@ main() {
   load_ip_iocs "$IP_IOC_FEED"
   normalize_ip_iocs
   print_summary
-  print_ipset_plan   # <--- add this
+  print_ipset_plan
+
+  if "$APPLY_FIREWALL"; then
+    apply_firewall
+  fi
+
   scan_files
 }
 
