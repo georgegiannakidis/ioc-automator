@@ -20,6 +20,7 @@ SCAN_ROOT="${SCAN_ROOT:-/tmp/ioc-sandbox}"
 MODE="dry"
 QUARANTINE_DIR=""
 APPLY_FIREWALL=false
+ROLLBACK_FIREWALL=false
 
 # --------------------------------------------------------------------
 # Argument parsing
@@ -41,6 +42,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --apply-firewall)
       APPLY_FIREWALL=true
+      shift
+      ;;
+    --rollback-firewall)
+      ROLLBACK_FIREWALL=true
       shift
       ;;
     *)
@@ -206,6 +211,27 @@ apply_firewall() {
   echo "===== End of Plan ====="
 }
 
+rollback_firewall() {
+  echo
+  echo "[*] Rolling back firewall changes for ioc_blocklist"
+
+  if command -v iptables >/dev/null 2>&1; then
+    # Remove rules if present
+    while sudo iptables -C INPUT -m set --match-set ioc_blocklist src -j DROP 2>/dev/null; do
+      sudo iptables -D INPUT -m set --match-set ioc_blocklist src -j DROP
+    done
+    while sudo iptables -C FORWARD -m set --match-set ioc_blocklist src -j DROP 2>/dev/null; do
+      sudo iptables -D FORWARD -m set --match-set ioc_blocklist src -j DROP
+    done
+  fi
+
+  if command -v ipset >/dev/null 2>&1; then
+    sudo ipset destroy ioc_blocklist 2>/dev/null || true
+  fi
+
+  echo "[*] Rollback complete."
+}
+
 scan_files() {
   echo
   echo "[*] Scanning for malicious files under: $SCAN_ROOT"
@@ -273,6 +299,11 @@ print_summary() {
 }
 
 main() {
+  if "$ROLLBACK_FIREWALL"; then
+    rollback_firewall
+    return 0
+  fi
+
   load_file_iocs "$FILE_IOC_FEED"
   load_ip_iocs "$IP_IOC_FEED"
   normalize_ip_iocs
