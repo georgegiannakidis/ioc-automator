@@ -6,7 +6,8 @@ Note:
 This project, including the Bash scripts, structure, and documentation, was created with the assistance of AI as part of my continuous learning in cybersecurity, automation, and threat-intel engineering.
 The repository serves as a learning project, a portfolio showcase, and a practical demonstration of security automation concepts.
 
-<p align="center"> <img src="screenshots/ioc-automator-banner.jpg" width="900"> </p> <p align="center"> <a href="https://github.com/georgegiannakidis/ioc-automator/stargazers"> <img src="https://img.shields.io/github/stars/georgegiannakidis/ioc-automator?style=for-the-badge"> </a> <a href="https://github.com/georgegiannakidis/ioc-automator/issues"> <img src="https://img.shields.io/github/issues/georgegiannakidis/ioc-automator?style=for-the-badge"> </a> <a href="https://github.com/georgegiannakidis/ioc-automator/pulls"> <img src="https://img.shields.io/github/issues-pr/georgegiannakidis/ioc-automator?style=for-the-badge"> </a> <img src="https://img.shields.io/github/languages/top/georgegiannakidis/ioc-automator?style=for-the-badge"> <img src="https://img.shields.io/github/license/georgegiannakidis/ioc-automator?style=for-the-badge"> <img src="https://img.shields.io/github/last-commit/georgegiannakidis/ioc-automator?style=for-the-badge"> </p>
+<p align="center"> <img src="screenshots/ioc-automator-banner.jpg" width="900"> </p> <p align="center">
+
 📌 Overview
 
 IoC Automator is a security automation tool designed to help blue-team defenders process Indicators of Compromise (IoCs) from threat intelligence feeds and take safe automated actions such as:
