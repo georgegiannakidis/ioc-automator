@@ -136,7 +136,22 @@ normalize_ip_iocs() {
   # Overwrite ip_iocs array with cleaned list
   mapfile -t ip_iocs < "$TMP_IPS"
 
-  echo "[*] Normalized IP IoCs: ${#ip_iocs[@]} entries"
+echo "[*] Normalized IP IoCs (after dedupe + private removal): ${#ip_iocs[@]} entries"
+
+# Optional: collapse overlapping CIDRs for efficiency
+if command -v aggregate >/dev/null 2>&1; then
+  echo "[*] Collapsing overlapping networks using 'aggregate'..."
+  printf "%s\n" "${ip_iocs[@]}" | aggregate > "$TMP_IPS.agg" || {
+    echo "[!] aggregate failed, keeping original list."
+  }
+  if [[ -s "$TMP_IPS.agg" ]]; then
+    mapfile -t ip_iocs < "$TMP_IPS.agg"
+    echo "[*] After aggregation: ${#ip_iocs[@]} entries"
+  fi
+else
+  echo "[*] 'aggregate' not installed, skipping CIDR aggregation."
+fi
+
 }
 
 scan_files() {
