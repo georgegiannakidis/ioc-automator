@@ -154,6 +154,24 @@ fi
 
 }
 
+print_ipset_plan() {
+  echo
+  echo "===== Firewall Dry-Run Plan ====="
+  echo "[*] Would create ipset: ioc_blocklist"
+  echo "ipset create ioc_blocklist hash:net -exist"
+
+  for ip in "${ip_iocs[@]}"; do
+    echo "ipset add ioc_blocklist $ip -exist"
+  done
+
+  echo
+  echo "[*] Would add iptables DROP rule:"
+  echo "iptables -I INPUT -m set --match-set ioc_blocklist src -j DROP"
+  echo "iptables -I FORWARD -m set --match-set ioc_blocklist src -j DROP"
+
+  echo "===== End of Plan ====="
+}
+
 scan_files() {
   echo
   echo "[*] Scanning for malicious files under: $SCAN_ROOT"
@@ -225,6 +243,7 @@ main() {
   load_ip_iocs "$IP_IOC_FEED"
   normalize_ip_iocs
   print_summary
+  print_ipset_plan   # <--- add this
   scan_files
 }
 
