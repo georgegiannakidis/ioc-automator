@@ -3,8 +3,8 @@
 Automated malware and IP threat indicator processing for blue-team defense
 
 Note:
-This project, including the Bash scripts, structure, and documentation, was created with the assistance of AI as part of my continuous learning in cybersecurity, automation, and threat-intel engineering.
-The repository serves as a learning project, a portfolio showcase, and a practical demonstration of security automation concepts.
+*The Bash scripts created with the assistance of AI as part of my continuous learning in cybersecurity, automation and threat-intel engineering.
+The repository serves as a learning project, a portfolio showcase and a practical demonstration of security automation concepts.*
 
 <p align="center"> <img src="screenshots/ioc-automator-banner.jpg" width="900"> </p> <p align="center">
 
@@ -19,9 +19,9 @@ IoC Automator is a security automation tool designed to help blue-team defenders
 - Running in safe dry-run mode by default
 - Rolling back all firewall changes cleanly
 
-This project demonstrates hands-on defensive automation skills used in SOC, IR, and threat-hunting workflows.
+This project demonstrates hands-on defensive automation skills used in SOC, IR and threat-hunting workflows.
 
-🔥 Features
+🔥 Features  
 **File IoC Processing**
 - Parse filename + hash IoCs
 - Calculate SHA-256 hash of located files
@@ -128,7 +128,7 @@ IP IoCs
 203.0.113.88`
 
 🎯 Learning Purpose
-This project was created with the assistance of AI as part of a learning journey into:
+This project was created with the assistance of *AI as part of a learning journey* into:
 Security automation
 Threat intelligence processing
 Bash scripting
